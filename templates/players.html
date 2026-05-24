@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Players - E-Sports Team Manager{% endblock %}
+
+{% block content %}
+<h1><i class="fas fa-user-friends"></i> Players Management</h1>
+
+<!-- STATS SECTION -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-user-circle"></i></div>
+        <div class="stat-content">
+            <div class="stat-number">{{ players|length }}</div>
+            <div class="stat-label">Total Players</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-content">
+            <div class="stat-number">{{ teams|length }}</div>
+            <div class="stat-label">Teams</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+        <div class="stat-content">
+            <div class="stat-number">5</div>
+            <div class="stat-label">Games</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+        <div class="stat-content">
+            <div class="stat-number">{{ (players|length / (teams|length if teams|length > 0 else 1))|round(1) }}</div>
+            <div class="stat-label">Avg/Team</div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD FORM SECTION -->
+<div class="card form-card">
+    <div class="card-header">
+        <h2><i class="fas fa-plus-circle"></i> Add New Player</h2>
+    </div>
+    <form method="POST" action="/player/add">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="player_name">Player Name</label>
+                <input type="text" id="player_name" name="player_name" required placeholder="e.g., Apex Pro">
+            </div>
+            <div class="form-group">
+                <label for="team_id">Team</label>
+                <select id="team_id" name="team_id" required onchange="updatePositions()">
+                    <option value="">Select Team</option>
+                    {% for team in teams %}
+                    <option value="{{ team['TeamID'] }}" data-game-id="{{ team['GameID'] }}">{{ team['TeamName'] }} ({{
+                        team['GameName'] or 'N/A' }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="position">Position</label>
+                <select id="position" name="position" required>
+                    <option value="">Select Position (Team First)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="join_date">Join Date</label>
+                <input type="date" id="join_date" name="join_date" required>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-success" style="flex: 1;"><i class="fas fa-plus"></i> Add New
+                Player</button>
+            <button type="reset" class="btn btn-secondary"><i class="fas fa-eraser"></i> Clear</button>
+        </div>
+    </form>
+</div>
+
+<!-- DATA TABLE SECTION -->
+<div class="card data-card">
+    <div class="card-header">
+        <h2><i class="fas fa-list"></i> All Players</h2>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">Total: <strong style="color: #a78bfa;">{{
+                players|length }}</strong> players</div>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th><i class="fas fa-user"></i> Player Name</th>
+                    <th><i class="fas fa-users"></i> Team</th>
+                    <th><i class="fas fa-gamepad"></i> Game</th>
+                    <th><i class="fas fa-rank-star"></i> Position</th>
+                    <th><i class="fas fa-calendar"></i> Join Date</th>
+                    <th><i class="fas fa-cogs"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td><strong>{{ player['PlayerName'] }}</strong></td>
+                    <td>{{ player['TeamName'] }}</td>
+                    <td>{{ player['GameName'] or 'N/A' }}</td>
+                    <td>
+                        <span
+                            style="background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%); color: white; padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">
+                            {{ player['Position'] }}
+                        </span>
+                    </td>
+                    <td>{{ player['JoinDate'] }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/player/{{ player['PlayerID'] }}/edit" class="btn btn-primary btn-small"><i
+                                    class="fas fa-edit"></i>
+                                Edit</a>
+                            <form method="POST" action="/player/{{ player['PlayerID'] }}/delete"
+                                style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-small"
+                                    onclick="return confirm('Delete this player?');"><i class="fas fa-trash"></i>
+                                    Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No players
+                        found. Add a player to get started!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    async function updatePositions() {
+        const teamSelect = document.getElementById('team_id');
+        const positionSelect = document.getElementById('position');
+        const selectedOption = teamSelect.options[teamSelect.selectedIndex];
+        const gameId = selectedOption.dataset.gameId;
+
+        if (!gameId) {
+            positionSelect.innerHTML = '<option value="">Select Position (Team First)</option>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/game-positions/${gameId}`);
+            const positions = await response.json();
+
+            positionSelect.innerHTML = '<option value="">Select Position</option>';
+            positions.forEach(pos => {
+                const option = document.createElement('option');
+                option.value = pos.PositionName;
+                option.textContent = pos.PositionName;
+                positionSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error fetching positions:', error);
+            positionSelect.innerHTML = '<option value="">Error loading positions</option>';
+        }
+    }
+</script>
+{% endblock %}

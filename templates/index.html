@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Home - E-Sports Team Manager{% endblock %}
+
+{% block content %}
+<h1><i class="fas fa-gamepad"></i> Welcome to E-Sports Team Manager</h1>
+
+<div class="card">
+    <h2><i class="fas fa-info-circle"></i> System Overview</h2>
+    <p style="font-size: 1.1rem; line-height: 1.8; color: #cbd5e1;">
+        This is an AI-powered relational database application designed to manage professional e-sports teams.
+        It tracks team information, player rosters, equipment allocation, and tournament achievements.
+    </p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;"><i class="fas fa-users" style="color: #a78bfa;"></i>
+        </div>
+        <div class="stat-number">{{ teams|length }}</div>
+        <div class="stat-label">Teams</div>
+    </div>
+    {% if teams %}
+    <div class="stat-card">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;"><i class="fas fa-user" style="color: #a78bfa;"></i></div>
+        <div class="stat-number">~{{ teams|length * 3 }}</div>
+        <div class="stat-label">Players</div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2><i class="fas fa-star"></i> Featured Teams</h2>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th><i class="fas fa-users"></i> Team Name</th>
+                    <th><i class="fas fa-user-tie"></i> Coach</th>
+                    <th><i class="fas fa-globe"></i> Country</th>
+                    <th><i class="fas fa-calendar"></i> Founded</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams[:5] %}
+                <tr>
+                    <td><strong>{{ team['TeamName'] }}</strong></td>
+                    <td>{{ team['Coach'] }}</td>
+                    <td>{{ team['Country'] }}</td>
+                    <td>{{ team['Founded'] }}</td>
+                    <td>
+                        <a href="/teams" class="btn btn-primary btn-small">View All</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2><i class="fas fa-bolt"></i> Quick Access</h2>
+    </div>
+    <div class="quick-links-grid">
+        <a href="/teams" class="quick-link-card teams-card">
+            <div class="quick-link-icon"><i class="fas fa-users"></i></div>
+            <div class="quick-link-title">Teams</div>
+            <div class="quick-link-desc">Manage rosters</div>
+            <div class="quick-link-arrow"><i class="fas fa-arrow-right"></i></div>
+        </a>
+        <a href="/players" class="quick-link-card players-card">
+            <div class="quick-link-icon"><i class="fas fa-user"></i></div>
+            <div class="quick-link-title">Players</div>
+            <div class="quick-link-desc">View stats</div>
+            <div class="quick-link-arrow"><i class="fas fa-arrow-right"></i></div>
+        </a>
+        <a href="/equipment" class="quick-link-card equipment-card">
+            <div class="quick-link-icon"><i class="fas fa-headphones"></i></div>
+            <div class="quick-link-title">Equipment</div>
+            <div class="quick-link-desc">Manage gear</div>
+            <div class="quick-link-arrow"><i class="fas fa-arrow-right"></i></div>
+        </a>
+        <a href="/tournaments" class="quick-link-card tournaments-card">
+            <div class="quick-link-icon"><i class="fas fa-trophy"></i></div>
+            <div class="quick-link-title">Tournaments</div>
+            <div class="quick-link-desc">Track events</div>
+            <div class="quick-link-arrow"><i class="fas fa-arrow-right"></i></div>
+        </a>
+        <a href="/dashboard" class="quick-link-card dashboard-card">
+            <div class="quick-link-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="quick-link-title">Dashboard</div>
+            <div class="quick-link-desc">View analytics</div>
+            <div class="quick-link-arrow"><i class="fas fa-arrow-right"></i></div>
+        </a>
+    </div>
+</div>
+{% endblock %}

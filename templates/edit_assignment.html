@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 2rem auto;">
+    <div class="card form-card">
+        <div class="card-header">
+            <h1><i class="fas fa-link"></i> Edit Equipment Assignment</h1>
+        </div>
+        <form method="POST" action="/assignment/{{ assignment['AssignmentID'] }}/edit">
+            <div class="form-group">
+                <label for="player_id">Player</label>
+                <select id="player_id" name="player_id" required>
+                    <option value="">Select Player</option>
+                    {% for player in players %}
+                    <option value="{{ player['PlayerID'] }}" {% if player['PlayerID']==assignment['PlayerID']
+                        %}selected{% endif %}>
+                        {{ player['PlayerName'] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="equipment_id">Equipment</label>
+                <select id="equipment_id" name="equipment_id" required>
+                    <option value="">Select Equipment</option>
+                    {% for eq in equipment %}
+                    <option value="{{ eq['EquipmentID'] }}" {% if eq['EquipmentID']==assignment['EquipmentID']
+                        %}selected{% endif %}>
+                        {{ eq['EquipmentName'] }} ({{ eq['Brand'] }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="assigned_date">Assigned Date</label>
+                <input type="date" id="assigned_date" name="assigned_date" value="{{ assignment['AssignedDate'] }}"
+                    required>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-success" style="flex: 1;"><i class="fas fa-save"></i> Save
+                    Changes</button>
+                <a href="/equipment" class="btn btn-secondary" style="flex: 1; text-align: center;"><i
+                        class="fas fa-times"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

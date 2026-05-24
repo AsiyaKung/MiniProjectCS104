@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Equipment - E-Sports Team Manager{% endblock %}
+
+{% block content %}
+<h1><i class="fas fa-headphones"></i> Equipment Management</h1>
+
+<!-- ADD EQUIPMENT FORM SECTION -->
+<div class="card form-card">
+    <div class="card-header">
+        <h2><i class="fas fa-plus-circle"></i> Add New Equipment</h2>
+    </div>
+    <form method="POST" action="/equipment/add">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="equipment_name">Equipment Name</label>
+                <input type="text" id="equipment_name" name="equipment_name" required
+                    placeholder="e.g., Mechanical Keyboard RGB">
+            </div>
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" name="type" required>
+                    <option value="">Select Type</option>
+                    <option value="Keyboard"><i class="fas fa-keyboard"></i> Keyboard</option>
+                    <option value="Mouse"><i class="fas fa-mouse"></i> Mouse</option>
+                    <option value="Headphones"><i class="fas fa-headphones"></i> Headphones</option>
+                    <option value="Monitor"><i class="fas fa-desktop"></i> Monitor</option>
+                    <option value="Chair"><i class="fas fa-chair"></i> Chair</option>
+                    <option value="PC"><i class="fas fa-desktop"></i> PC</option>
+                    <option value="Mousepad"><i class="fas fa-square"></i> Mousepad</option>
+                    <option value="Webcam"><i class="fas fa-video"></i> Webcam</option>
+                    <option value="Microphone"><i class="fas fa-microphone"></i> Microphone</option>
+                    <option value="Storage"><i class="fas fa-database"></i> Storage</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="brand">Brand</label>
+                <input type="text" id="brand" name="brand" required placeholder="e.g., Corsair">
+            </div>
+            <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input type="number" id="price" name="price" step="0.01" required placeholder="0.00">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="purchase_date">Purchase Date</label>
+            <input type="date" id="purchase_date" name="purchase_date" required>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-success" style="flex: 1;"><i class="fas fa-plus"></i> Add New
+                Equipment</button>
+            <button type="reset" class="btn btn-secondary"><i class="fas fa-eraser"></i> Clear</button>
+        </div>
+    </form>
+</div>
+
+<!-- EQUIPMENT LIST SECTION -->
+<div class="card data-card">
+    <div class="card-header">
+        <h2><i class="fas fa-box"></i> All Equipment</h2>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">Total: <strong style="color: #a78bfa;">{{
+                equipment|length }}</strong> items</div>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th><i class="fas fa-box"></i> Equipment Name</th>
+                    <th><i class="fas fa-tags"></i> Type</th>
+                    <th><i class="fas fa-building"></i> Brand</th>
+                    <th><i class="fas fa-dollar-sign"></i> Price</th>
+                    <th><i class="fas fa-calendar"></i> Purchase Date</th>
+                    <th><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eq in equipment %}
+                <tr>
+                    <td><strong>{{ eq['EquipmentName'] }}</strong></td>
+                    <td>
+                        <span
+                            style="background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%); color: white; padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.85rem;">
+                            {{ eq['Type'] }}
+                        </span>
+                    </td>
+                    <td>{{ eq['Brand'] }}</td>
+                    <td><strong style="color: #10b981;">${{ "%.2f"|format(eq['Price']) }}</strong></td>
+                    <td>{{ eq['PurchaseDate'] }}</td>
+                    <td style="display: flex; gap: 0.5rem;">
+                        <a href="/equipment/{{ eq['EquipmentID'] }}/edit" class="btn btn-sm btn-primary"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"><i class="fas fa-edit"></i> Edit</a>
+                        <form method="POST" action="/equipment/{{ eq['EquipmentID'] }}/delete" style="display: inline;"
+                            onsubmit="return confirm('Delete this equipment?');">
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"><i class="fas fa-trash"></i>
+                                Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No
+                        equipment found. Add equipment to get started!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ASSIGN EQUIPMENT FORM SECTION -->
+<div class="card form-card">
+    <div class="card-header">
+        <h2><i class="fas fa-link"></i> Assign Equipment to Players</h2>
+    </div>
+    <form method="POST" action="/assignment/add">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="player_id">Player</label>
+                <select id="player_id" name="player_id" required>
+                    <option value="">Select Player</option>
+                    {% for player in players %}
+                    <option value="{{ player['PlayerID'] }}">{{ player['PlayerName'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="equipment_id">Equipment</label>
+                <select id="equipment_id" name="equipment_id" required>
+                    <option value="">Select Equipment</option>
+                    {% for eq in equipment %}
+                    <option value="{{ eq['EquipmentID'] }}">{{ eq['EquipmentName'] }} ({{ eq['Brand'] }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-row full">
+            <div class="form-group">
+                <label for="assigned_date">Assigned Date</label>
+                <input type="date" id="assigned_date" name="assigned_date" required>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-success" style="flex: 1;">🔗 Assign Equipment</button>
+            <button type="reset" class="btn btn-secondary">Clear</button>
+        </div>
+    </form>
+</div>
+
+<!-- ASSIGNMENTS LIST SECTION -->
+<div class="card data-card">
+    <div class="card-header">
+        <h2>👥 Equipment Assignments</h2>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">Total: <strong style="color: #a78bfa;">{{
+                assignments|length }}</strong> assignments</div>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>👤 Player</th>
+                    <th>📦 Equipment</th>
+                    <th>📅 Assigned Date</th>
+                    <th><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in assignments %}
+                <tr>
+                    <td><strong>{{ assignment['PlayerName'] }}</strong></td>
+                    <td>{{ assignment['EquipmentName'] }}</td>
+                    <td>{{ assignment['AssignedDate'] }}</td>
+                    <td style="display: flex; gap: 0.5rem;">
+                        <a href="/assignment/{{ assignment['AssignmentID'] }}/edit" class="btn btn-sm btn-primary"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"><i class="fas fa-edit"></i> Edit</a>
+                        <form method="POST" action="/assignment/{{ assignment['AssignmentID'] }}/delete"
+                            style="display: inline;" onsubmit="return confirm('Remove this assignment?');">
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.85rem;"><i class="fas fa-trash"></i>
+                                Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No
+                        assignments found. Assign equipment to players!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

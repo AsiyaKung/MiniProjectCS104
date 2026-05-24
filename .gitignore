@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# Documentation & Setup Files (keep only README.md)
+DEPLOYMENT_*.txt
+DEPLOY_*.txt
+PYTHONANYWHERE_*.txt
+GITHUB_*.txt
+QUICK_START.txt
+PRESENTATION_*.txt
+PROJECT_*.txt
+REPORT_*.md
+ER_DIAGRAM_*.txt
+test_deployment.py

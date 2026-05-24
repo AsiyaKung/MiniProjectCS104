@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Equipment - E-Sports Team Manager{% endblock %}
+
+{% block content %}
+<h1><i class="fas fa-edit"></i> Edit Equipment</h1>
+
+<div class="card">
+    <form method="POST" action="/equipment/{{ equipment['EquipmentID'] }}/edit">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="equipment_name">Equipment Name</label>
+                <input type="text" id="equipment_name" name="equipment_name" value="{{ equipment['EquipmentName'] }}"
+                    required placeholder="e.g., Mechanical Keyboard RGB">
+            </div>
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" name="type" required>
+                    <option value="">-- Select Type --</option>
+                    <option value="Keyboard" {% if equipment['Type']=='Keyboard' %}selected{% endif %}>Keyboard</option>
+                    <option value="Mouse" {% if equipment['Type']=='Mouse' %}selected{% endif %}>Mouse</option>
+                    <option value="Headphones" {% if equipment['Type']=='Headphones' %}selected{% endif %}>Headphones
+                    </option>
+                    <option value="Monitor" {% if equipment['Type']=='Monitor' %}selected{% endif %}>Monitor</option>
+                    <option value="Chair" {% if equipment['Type']=='Chair' %}selected{% endif %}>Chair</option>
+                    <option value="PC" {% if equipment['Type']=='PC' %}selected{% endif %}>PC</option>
+                    <option value="Mousepad" {% if equipment['Type']=='Mousepad' %}selected{% endif %}>Mousepad</option>
+                    <option value="Webcam" {% if equipment['Type']=='Webcam' %}selected{% endif %}>Webcam</option>
+                    <option value="Microphone" {% if equipment['Type']=='Microphone' %}selected{% endif %}>Microphone
+                    </option>
+                    <option value="Storage" {% if equipment['Type']=='Storage' %}selected{% endif %}>Storage</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="brand">Brand</label>
+                <input type="text" id="brand" name="brand" value="{{ equipment['Brand'] }}" required
+                    placeholder="e.g., Corsair">
+            </div>
+            <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input type="number" id="price" name="price" step="0.01" value="{{ equipment['Price'] }}" required
+                    placeholder="0.00">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="purchase_date">Purchase Date</label>
+            <input type="date" id="purchase_date" name="purchase_date" value="{{ equipment['PurchaseDate'] }}" required>
+        </div>
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Changes</button>
+            <a href="/equipment" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

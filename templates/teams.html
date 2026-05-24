@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Teams - E-Sports Team Manager{% endblock %}
+
+{% block content %}
+<h1><i class="fas fa-users"></i> Teams Management</h1>
+
+<!-- ADD FORM SECTION -->
+<div class="card form-card">
+    <div class="card-header">
+        <h2><i class="fas fa-plus-circle"></i> Add New Team</h2>
+    </div>
+    <form method="POST" action="/teams">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="team_name">Team Name</label>
+                <input type="text" id="team_name" name="team_name" required placeholder="e.g., Dragon Slayers">
+            </div>
+            <div class="form-group">
+                <label for="game_id">Game</label>
+                <select id="game_id" name="game_id" required>
+                    <option value="">-- Select Game --</option>
+                    {% for game in games %}
+                    <option value="{{ game['GameID'] }}"><i class="fas fa-gamepad"></i> {{ game['GameName'] }} ({{
+                        game['GameType'] }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="founded">Founded Date</label>
+                <input type="date" id="founded" name="founded" required>
+            </div>
+            <div class="form-group">
+                <label for="coach">Coach Name</label>
+                <input type="text" id="coach" name="coach" required placeholder="e.g., Coach Alex">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group" style="grid-column: span 2;">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" required placeholder="e.g., Thailand">
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-success" style="flex: 1;"><i class="fas fa-plus"></i> Add New
+                Team</button>
+            <button type="reset" class="btn btn-secondary"><i class="fas fa-eraser"></i> Clear</button>
+        </div>
+    </form>
+</div>
+
+<!-- DATA TABLE SECTION -->
+<div class="card data-card">
+    <div class="card-header">
+        <h2><i class="fas fa-list"></i> All Teams</h2>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">Total: <strong style="color: #a78bfa;">{{
+                teams|length }}</strong> teams</div>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th><i class="fas fa-users"></i> Team Name</th>
+                    <th><i class="fas fa-gamepad"></i> Game</th>
+                    <th><i class="fas fa-user-tie"></i> Coach</th>
+                    <th><i class="fas fa-globe"></i> Country</th>
+                    <th><i class="fas fa-calendar"></i> Founded</th>
+                    <th><i class="fas fa-cogs"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                <tr>
+                    <td><strong>{{ team['TeamName'] }}</strong></td>
+                    <td>{{ team['GameName'] or 'N/A' }}</td>
+                    <td>{{ team['Coach'] }}</td>
+                    <td>{{ team['Country'] }}</td>
+                    <td>{{ team['Founded'] }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="/team/{{ team['TeamID'] }}/edit" class="btn btn-primary btn-small"><i
+                                    class="fas fa-edit"></i> Edit</a>
+                            <form method="POST" action="/team/{{ team['TeamID'] }}/delete" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-small"
+                                    onclick="return confirm('Delete this team?');"><i class="fas fa-trash"></i>
+                                    Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No teams
+                        found. Create one to get started!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
