@@ -1,0 +1,453 @@
+โปรเจคจัดการทีมอี-สปอร์ต - รายงานโปรเจค
+
+========================================
+หน้าปกโปรเจค
+========================================
+
+ชื่อกลุ่ม: [ใส่ชื่อกลุ่ม]
+ชื่อโปรเจค: E-Sports Team Manager (ระบบจัดการทีมแข่งเกม)
+วิชา: CS104 Introduction to Database
+สมาชิก:
+
+- [ชื่อคนที่ 1] - ID [หมู่เรียน]
+- [ชื่อคนที่ 2] - ID [หมู่เรียน]
+- [ชื่อคนที่ 3] - ID [หมู่เรียน]
+
+
+========================================
+หมวดที่ 1: บทนำ
+========================================
+
+1.1 ที่มาและความสำคัญของโปรเจค
+
+ระบบนี้พัฒนาขึ้นเพื่อแก้ปัญหาการจัดการข้อมูลทีมแข่งเกม (E-Sports Teams) ที่ไม่มีระบบศูนย์กลาง
+ปัจจุบันทีมแข่งเกมมีนักเล่นหลายคน อุปกรณ์หลากหลาย และการแข่งขันต่างๆ ที่ต้องการการบริหารจัดการอย่างมีประสิทธิภาพ
+
+ความสำคัญ:
+- ลดการสูญหายของข้อมูล
+- เพิ่มความเร็วในการค้นหาข้อมูล
+- ติดตามประวัติการแข่งขันและผลสำเร็จ
+- ลดความสับสนในการจัดสรรอุปกรณ์
+
+
+1.2 ขอบเขตของระบบ
+
+ระบบ E-Sports Team Manager สามารถทำได้ดังนี้:
+
+รองรับหลายเกม:
+- 5 เกมที่สนับสนุน: League of Legends, Valorant, Dota 2, CS:GO, Overwatch
+- ตำแหน่งเฉพาะของแต่ละเกม (LoL: Top/Mid/ADC/Support/Jungle; Valorant: Entry Fragger/AWP/Initiator/Controller/IGL)
+- แต่ละทีมเล่นเกมเดียวเท่านั้น
+
+จัดการข้อมูลทีม (CRUD):
+- เพิ่ม/ลบ/แก้ไข: ชื่อทีม, เกม, โค้ช, ประเทศ, วันที่ก่อตั้ง
+
+จัดการข้อมูลนักเล่น (CRUD):
+- เพิ่มนักเล่นเข้าทีม (ตำแหน่งอัตโนมัติตามเกมที่ทีมเล่น)
+- แก้ไข/ลบข้อมูลนักเล่น
+- ติดตามประวัติการเข้าทีม
+
+จัดการครุภัณฑ์อุปกรณ์ (CRUD):
+- เพิ่ม/แก้ไข/ลบ อุปกรณ์ (ชื่อ, ประเภท, ยี่ห้อ, ราคา, วันที่ซื้อ)
+- จัดสรรอุปกรณ์ให้นักเล่น (ความสัมพันธ์ M:N)
+- แก้ไข/ลบการจัดสรร
+
+บันทึกการแข่งขัน (CRUD):
+- เพิ่ม/แก้ไข/ลบ การแข่งขัน (ชื่อ, เกม, วันเวลา, สถานที่, ปูลรางวัล)
+- บันทึกผลการแข่ง (อันดับ, เงินรางวัล)
+- แก้ไข/ลบผลการแข่ง
+
+ดูรายงานสรุป (Dashboard):
+- สถิติทั่วไป (จำนวนทีม, นักเล่น, เกม, อุปกรณ์)
+- ข้อมูลเกมต่างๆที่เล่น
+
+========================================
+หมวดที่ 2: การออกแบบและวิเคราะห์ฐานข้อมูล
+========================================
+
+2.1 คำอธิบาย ER Diagram (แผนภาพความสัมพันธ์เอนทิตี)
+
+เอนทิตี (Entity) และความสัมพันธ์:
+
+ตาราง GAMES
+|
+|-- ความสัมพันธ์ 1:N กับ Teams (ทีม)
+|-- ความสัมพันธ์ 1:N กับ GamePositions (ตำแหน่งเกม)
+|
+
+ตาราง GAMEPOSITIONS
+(เก็บชื่อตำแหน่งของแต่ละเกม)
+
+ตาราง TEAMS (เชื่อมกับ Games ผ่าน GameID)
+|
+|-- ความสัมพันธ์ 1:N กับ Players (นักเล่น)
+|
+
+ตาราง PLAYERS (เชื่อมกับ Teams ผ่าน TeamID)
+|
+|-- ความสัมพันธ์ M:N ผ่าน EquipmentAssignment
+|
+
+ตาราง EQUIPMENT
+(เก็บข้อมูลอุปกรณ์)
+|
+|-- ความสัมพันธ์ M:N ผ่าน EquipmentAssignment
+|
+
+ตาราง EQUIPMENTASSIGNMENT (ตารางเชื่อมโยง)
+(เชื่อมนักเล่นและอุปกรณ์)
+
+ตาราง TOURNAMENTS
+|
+|-- ความสัมพันธ์ 1:N กับ TournamentResults
+|
+
+ตาราง TOURNAMENTRESULTS
+(บันทึกผลการแข่งของทีม)
+
+
+2.2 การวิเคราะห์แต่ละตาราง
+
+ตาราง Games (เกม)
+- วัตถุประสงค์: เก็บข้อมูลประเภทเกม
+- เหตุผล: ระบบรองรับหลายเกม (LoL, Valorant, Dota 2, CS:GO, Overwatch) แต่ละเกมมีตำแหน่งต่างกัน ต้องแยกเพื่อการบริหาร
+
+ตาราง GamePositions (ตำแหน่งเกม)
+- วัตถุประสงค์: เก็บชื่อตำแหน่งของแต่ละเกม
+- เหตุผล: แต่ละเกมมีตำแหน่งต่างกัน (LoL: Top/Mid/ADC/Support/Jungle; Valorant: Entry Fragger/AWP/Initiator/Controller/IGL)
+
+ตาราง Teams (ทีม)
+- วัตถุประสงค์: เก็บข้อมูลทีมแข่งเกม
+- เหตุผล: ทีมเป็นหน่วยพื้นฐาน แต่ละทีมเล่นเกมเดียว ต้องแยกตารางเพื่อหลีกเลี่ยงการซ้ำซ้อน
+
+ตาราง Players (นักเล่น)
+- วัตถุประสงค์: เก็บข้อมูลนักเล่น
+- เหตุผล: แต่ละทีมมีนักเล่นหลายคน ตำแหน่งจะหมายถึงตำแหน่งที่เหมาะสมกับเกมที่ทีมเล่น
+
+ตาราง Equipment (อุปกรณ์)
+- วัตถุประสงค์: เก็บข้อมูลครุภัณฑ์อุปกรณ์
+- เหตุผล: อุปกรณ์มีจำนวนมากและราคาแพง ต้องติดตามข้อมูลโดยแยก ประเภท ยี่ห้อ ราคา และวันซื้อ
+
+ตาราง EquipmentAssignment (การจัดสรรอุปกรณ์)
+- วัตถุประสงค์: เชื่อมนักเล่นกับอุปกรณ์
+- เหตุผล: ความสัมพันธ์ M:N นักเล่นหนึ่งคนมีหลายอุปกรณ์ และอุปกรณ์หนึ่งชิ้นอาจจัดสรรให้หลายนักเล่น
+
+ตาราง Tournaments (การแข่งขัน)
+- วัตถุประสงค์: เก็บข้อมูลการแข่งขัน
+- เหตุผล: ติดตามการแข่งขันที่แตกต่างกัน เกมต่างๆ ช่วงเวลาต่างๆ ต้องจัดเก็บแยกกัน
+
+ตาราง TournamentResults (ผลการแข่ง)
+- วัตถุประสงค์: บันทึกผลการแข่งขัน
+- เหตุผล: แต่ละทีมสามารถแข่งในหลายการแข่งขัน แต่ละครั้งมีผลต่างกัน ต้องเชื่อมอันดับและเงินรางวัล
+
+
+2.3 การวิเคราะห์ตรรกะความเชื่อมโยง
+
+ความเชื่อมโยงที่ 1: Games ↔ Teams (ความสัมพันธ์ 1:N)
+ตรรกะ: GameID เป็น Foreign Key ในตาราง Teams เพื่อระบุว่าทีมแต่ละทีมเล่นเกมไหน ทีมหนึ่งเล่นเกมเดียว (1:N) เกมหนึ่งอาจมีหลายทีม
+
+ตัวอย่าง:
+- Game ID 1 (League of Legends) ← ทีม: Dragon Slayers, Phoenix Force, Shadow Guild
+- Game ID 3 (Valorant) ← ทีม: Titan Squad, Pixel Masters
+
+ความเชื่อมโยงที่ 2: Games ↔ GamePositions (ความสัมพันธ์ 1:N)
+ตรรกะ: GameID เป็น Foreign Key ในตาราง GamePositions ระบบจะโหลดตำแหน่งอัตโนมัติตามเกมที่ทีมเล่น
+
+ตัวอย่าง:
+- Game ID 1 (LoL) → ตำแหน่ง: Top, Mid, ADC, Support, Jungle
+- Game ID 3 (Valorant) → ตำแหน่ง: Entry Fragger, AWP, Initiator, Controller, IGL
+
+ความเชื่อมโยงที่ 3: Teams ↔ Players (ความสัมพันธ์ 1:N)
+ตรรกะ: TeamID เป็น Foreign Key ในตาราง Players อนุญาตให้ 1 ทีมมีนักเล่นหลายคน (1:N) และติดตามประวัติการเข้า-ออกทีมของนักเล่น
+
+ความสำคัญต่อระบบ: ถ้าขาดความเชื่อมโยงนี้:
+- ระบบไม่สามารถทราบว่านักเล่นคนไหนอยู่ในทีมไหน
+- ไม่สามารถดึงรายชื่อนักเล่นของแต่ละทีม
+- ไม่สามารถลบทีมโดยอัตโนมัติลบข้อมูลนักเล่นที่เกี่ยวข้อง (Cascade Delete)
+- ข้อมูลจะวุ่นวายและบันทึกไม่ได้ถูกต้อง
+
+ความเชื่อมโยงที่ 4: EquipmentAssignment (M:N) ↔ Players, Equipment
+ตรรกะ: สร้างตาราง Junction Table (EquipmentAssignment) เพื่อแก้ความสัมพันธ์ M:N
+นักเล่นหนึ่งคน มี Keyboard, Mouse, Monitor ฯลฯ (หลายอุปกรณ์) อุปกรณ์หนึ่งชิ้น (เช่น Gaming PC) อาจมีนักเล่นหลายคนใช้ร่วม
+
+ความสำคัญต่อระบบ: ถ้าออกแบบผิด เช่นเก็บ EquipmentID โดยตรงในตาราง Players:
+- ไม่สามารถเก็บอุปกรณ์หลายชิ้นต่อนักเล่น (เนื้อที่ 1 column เท่านั้น)
+- อัปเดตข้อมูลอุปกรณ์ยากขึ้น
+- ลบอุปกรณ์จะส่งผลต่อข้อมูลนักเล่น
+- ต้องใช้ Junction Table เพื่อความยืดหยุ่น
+
+
+2.4 การวิเคราะห์ความสมบูรณ์ของข้อมูล
+
+การเลือกประเภทข้อมูล:
+
+TeamID - INTEGER
+เหตุผล: รหัส ต้องเป็นตัวเลขสำหรับ Indexing ด้วยความเร็ว
+
+TeamName - TEXT
+เหตุผล: ชื่อทีมเป็นข้อความธรรมชาติ
+
+Founded - DATE
+เหตุผล: ใช้ DATE สำหรับการเปรียบเทียบวันที่ง่าย (เช่น ทีมเก่าสุด)
+
+Price (Equipment) - REAL
+เหตุผล: ราคาอาจมีทศนิยม ($99.99)
+
+PlayerID (Foreign Key) - INTEGER
+เหตุผล: ต้องจับคู่กับ Primary Key ของตาราง Players
+
+การใช้ Constraint (ข้อจำกัด):
+
+NOT NULL Constraints:
+- ชื่อทีม, ชื่อนักเล่น, ประเภทอุปกรณ์ MUST NOT be NULL
+- ข้อมูลเหล่านี้จำเป็น ถ้า NULL ระบบจะเสียความหมาย
+
+UNIQUE Constraints:
+- TeamName ต้อง UNIQUE
+- ป้องกันการสร้างทีมที่มีชื่อเดียวกัน (ทำให้สับสน)
+
+PRIMARY KEY:
+- TeamID, PlayerID, EquipmentID
+- ต้องมี Primary Key เพื่อระบุแต่ละเรกคอร์ดได้อย่างไม่สำเร็จ
+
+FOREIGN KEY:
+- TeamID ใน Players ต้องอ้างอิง Teams.TeamID
+- ป้องกันการสร้างนักเล่นโดยชี้ไปยังทีมที่ไม่มีอยู่
+
+นโยบายค่าว่าง (Null Value Policy):
+
+PlayerName - NOT NULL (ต้องรู้ชื่อนักเล่น)
+JoinDate - NOT NULL (ต้องรู้วันเข้าทีม)
+Coach - NOT NULL (ทีมต้องมีโค้ช)
+PurchaseDate (Equipment) - NOT NULL (ต้องติดตามเมื่อซื้อ)
+Placement - NOT NULL (ต้องทราบอันดับที่ได้)
+
+
+========================================
+หมวดที่ 3: คำอธิบายส่วนต่อประสานเว็บ
+========================================
+
+3.1 หน้า Dashboard (หน้าแสดงสรุป)
+
+คำอธิบาย:
+หน้านี้ดึงข้อมูลจากตาราง Teams, Players, Equipment, Tournaments และแสดงผลในรูปแบบ Statistics Cards
+
+ระบบสามารถแสดง:
+- จำนวนทีมทั้งหมด (COUNT จากตาราง Teams)
+- จำนวนนักเล่นทั้งหมด (COUNT จากตาราง Players)
+- จำนวนอุปกรณ์ (COUNT จากตาราง Equipment)
+- จำนวนการแข่งขัน (COUNT จากตาราง Tournaments)
+- ทีมที่มีรางวัลเงินมากที่สุด (SUM PrizeMoney จาก TournamentResults)
+
+
+3.2 หน้าจัดการทีม (Teams CRUD Page)
+
+คำอธิบาย:
+ระบบสามารถจัดการข้อมูลในตาราง Teams ได้แบบ Real-time
+
+เพิ่มข้อมูล (CREATE):
+- ฟอร์มให้ใส่: ชื่อทีม, วันที่ก่อตั้ง, โค้ช, ประเทศ
+- Click "เพิ่มทีม" → INSERT INTO Teams VALUES (...)
+
+อ่านข้อมูล (READ):
+- ตารางแสดงทีมทั้งหมดที่ดึงจากคำสั่ง SELECT * FROM Teams
+
+แก้ไขข้อมูล (UPDATE):
+- คลิกปุ่ม Edit ที่ทีมใดก็ได้
+- แก้ไขข้อมูล → Click Save
+- ระบบรันคำสั่ง UPDATE Teams SET ... WHERE TeamID = ?
+
+ลบข้อมูล (DELETE):
+- คลิกปุ่ม Delete → ยืนยันที่ pop-up
+- ระบบรันคำสั่ง DELETE FROM Teams WHERE TeamID = ?
+
+
+3.3 หน้าจัดการนักเล่น (Players Page)
+
+คำอธิบาย:
+ระบบใช้ SQL JOIN เพื่อแสดงข้อมูลนักเล่นพร้อมชื่อทีม
+
+คำสั่ง SQL:
+SELECT p.PlayerName, t.TeamName, p.Position, p.JoinDate
+FROM Players p
+JOIN Teams t ON p.TeamID = t.TeamID
+
+ความสำคัญของ JOIN:
+- ไม่ต้องแสดง TeamID (ตัวเลขที่เข้าใจยาก)
+- แสดง TeamName ที่อ่านสะดวกมากขึ้น
+- เมื่อแก้ไขชื่อทีม ข้อมูลจะอัพเดตอัตโนมัติ
+
+
+3.4 หน้าจัดการอุปกรณ์และการจัดสรร (Equipment & Assignment Page)
+
+คำอธิบาย:
+
+ส่วนที่ 1: เพิ่มอุปกรณ์
+- สามารถเพิ่มอุปกรณ์ใหม่ (Keyboard, Mouse, Monitor ฯลฯ)
+- บันทึก Brand, Price, PurchaseDate
+
+ส่วนที่ 2: การจัดสรรอุปกรณ์
+- ใช้ Dropdown เลือก Player และ Equipment
+- Click "จัดสรรอุปกรณ์" → INSERT INTO EquipmentAssignment VALUES (...)
+
+ส่วนที่ 3: รายการการจัดสรร
+- ตารางแสดง Player-Equipment Mapping ที่ดึงจาก:
+  SELECT p.PlayerName, e.EquipmentName, ea.AssignedDate
+  FROM EquipmentAssignment ea
+  JOIN Players p ON ea.PlayerID = p.PlayerID
+  JOIN Equipment e ON ea.EquipmentID = e.EquipmentID
+
+
+3.5 หน้าจัดการการแข่งขัน (Tournaments Page)
+
+คำอธิบาย:
+
+ส่วนที่ 1: เพิ่มการแข่งขัน
+- เพิ่มการแข่งขัน (ชื่อ, เกม, วันเวลา, สถานที่, เงินรางวัล)
+
+ส่วนที่ 2: ผลการแข่ง
+- บันทึกผลการแข่ง (ทีม, อันดับ, เงินรางวัล)
+- แสดง เหรียญทอง เหรียญเงิน เหรียญทองแดง สำหรับอันดับ 1-3
+
+
+========================================
+หมวดที่ 4: บันทึกทางเทคนิค
+========================================
+
+4.1 ตัวอย่าง SQL Query ที่สำคัญ
+
+QUERY 1: ดึงรายชื่อนักเล่นพร้อมทีม
+
+SELECT p.PlayerName, t.TeamName, p.Position
+FROM Players p
+JOIN Teams t ON p.TeamID = t.TeamID
+ORDER BY t.TeamName;
+
+ผลลัพธ์: แสดงชื่อนักเล่น ทีม ตำแหน่ง เรียงตามชื่อทีม
+
+---
+
+QUERY 2: ดึงอุปกรณ์ที่จัดสรรให้นักเล่น
+
+SELECT p.PlayerName, e.EquipmentName, e.Brand, ea.AssignedDate
+FROM EquipmentAssignment ea
+JOIN Players p ON ea.PlayerID = p.PlayerID
+JOIN Equipment e ON ea.EquipmentID = e.EquipmentID;
+
+ผลลัพธ์: แสดงอุปกรณ์ของแต่ละนักเล่น
+
+---
+
+QUERY 3: ดึงผลการแข่งขันของแต่ละทีม
+
+SELECT t.TeamName, to.TournamentName, tr.Placement, tr.PrizeMoney
+FROM TournamentResults tr
+JOIN Teams t ON tr.TeamID = t.TeamID
+JOIN Tournaments to ON tr.TournamentID = to.TournamentID
+ORDER BY tr.PrizeMoney DESC;
+
+ผลลัพธ์: ทีมไหนแข่งในการแข่งไหน ได้อันดับเท่าไร เงินรางวัลเท่าไร
+
+---
+
+QUERY 4: ทีมที่มีรางวัลมากที่สุด
+
+SELECT t.TeamName, SUM(tr.PrizeMoney) as TotalPrize
+FROM Teams t
+LEFT JOIN TournamentResults tr ON t.TeamID = tr.TeamID
+GROUP BY t.TeamID
+ORDER BY TotalPrize DESC;
+
+ผลลัพธ์: อันดับทีมตามรางวัลเงินที่ได้รวม
+
+
+4.2 บันทึก AI และระบบ
+
+Prompt ตัวอย่างที่ใช้:
+"Create a complete Flask web application for managing e-sports teams.
+Include database tables for Teams, Players, Equipment with many-to-many relationships.
+Implement full CRUD operations with HTML forms.
+Make it professional looking with Bootstrap-like styling."
+
+การปรับปรุงแก้ไขโค้ดจาก AI:
+
+1. เพิ่มตาราง EquipmentAssignment (ความสัมพันธ์ M:N)
+   - AI ให้พื้นฐาน 5 ตาราง ต้องเพิ่มให้ครบ 9 ตาราง
+
+2. เพิ่มตาราง TournamentResults
+   - เพื่อติดตามผลการแข่ง อันดับ เงินรางวัล
+
+3. ปรับเพิ่ม Foreign Key Constraint
+   - ต้องเพิ่ม CASCADE DELETE สำหรับความสมบูรณ์
+
+4. จัดเรียง HTML/CSS ให้สวยงาม
+   - เพิ่มสี Gradient (Purple/Blue)
+   - เพิ่ม Icons และ Responsive Design
+
+5. เพิ่มข้อมูลจำลอง (Sample Data)
+   - ต้องทำให้ครบ 65+ Records
+
+
+========================================
+หมวดที่ 5: หน้าที่ของสมาชิก
+========================================
+
+สมาชิกคนที่ 1: [ชื่อ] - ผู้ออกแบบฐานข้อมูล & ผู้นำทีม
+
+หน้าที่:
+- ออกแบบ Database Schema (9 ตาราง)
+- จัดทำ ER Diagram
+- ออกแบบ Relationship Logic
+- ทดสอบ Data Integrity
+- เตรียมตัวนำเสนอส่วน Database
+
+---
+
+สมาชิกคนที่ 2: [ชื่อ] - ผู้พัฒนา Backend
+
+หน้าที่:
+- พัฒนา Python Flask Application
+- เขียน SQL Queries และ Database Connection
+- สร้างฟังก์ชัน CRUD
+- ใช้ AI ช่วยในการเขียน Code
+- ทดสอบ System Integration
+
+---
+
+สมาชิกคนที่ 3: [ชื่อ] - ผู้ออกแบบ Frontend & เขียนรายงาน
+
+หน้าที่:
+- ออกแบบ UI/UX Templates (HTML/CSS)
+- สร้าง Dashboard และ CRUD Pages
+- เขียน Prompt สำหรับ AI
+- จัดทำรายงานโปรเจค (Report)
+- บันทึกวิดีโอนำเสนอ
+
+
+========================================
+สรุปผลโปรเจค
+========================================
+
+ระบบ E-Sports Team Manager เป็นตัวอย่างที่ดีของ:
+
+การออกแบบฐานข้อมูลที่ถูกต้อง:
+- Database design ที่ถูกต้อง (9 ตาราง, ความสัมพันธ์)
+- CRUD Operations ที่สมบูรณ์
+- Data Integrity & Constraint
+- SQL JOINs และการเชื่อมโยงข้อมูล
+- Web Interface ที่ใช้งานได้จริง
+- AI Collaboration ในการพัฒนา
+
+ข้อมูลครบถ้วน:
+- 65+ Mock Data Records
+- 9 Tables ที่มีความสัมพันธ์
+- Full CRUD Functionality
+- Real-time Data Management
+
+โปรเจคนี้แสดงให้เห็น:
+- ความเข้าใจเกี่ยวกับ Relational Databases
+- การใช้ความสัมพันธ์ข้อมูลที่ซับซ้อน
+- การพัฒนา Web Application
+- ระบบการจัดการข้อมูลมืออาชีพ
+- การใช้เครื่องมือ AI ที่มีประสิทธิภาพในการพัฒนา
+
