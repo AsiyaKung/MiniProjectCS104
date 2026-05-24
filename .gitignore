@@ -37,6 +37,8 @@ env/
 *.db
 *.sqlite
 *.sqlite3
+# Keep main project database
+!esports_manager.db
 
 # Environment
 .env
