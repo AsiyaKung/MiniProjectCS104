@@ -1,0 +1,176 @@
+======================================
+🚀 DEPLOY ขึ้น RENDER.COM
+======================================
+
+E-Sports Team Manager - Simple Deploy Guide
+
+======================================
+ทำไมต้อง RENDER?
+======================================
+
+ดีกว่า Vercel ด้วย:
+✅ Flask ซับพอร์ตโดยตรง
+✅ Database persist ได้
+✅ ไม่มี cold start issues
+✅ Free tier สวยงาม
+✅ Auto deploy จาก GitHub
+
+======================================
+STEP 1: สร้าง Render Account (5 นาที)
+======================================
+
+1. ไปที่: https://render.com
+2. Click "Sign up"
+3. เลือก: Sign up with GitHub
+4. Authorize Render
+5. Create account
+
+✅ สร้างเสร็จ
+
+======================================
+STEP 2: ตรวจสอบ GitHub
+======================================
+
+สิ่งที่ต้องมี:
+✅ Code ขึ้น GitHub ที่ https://github.com/AsiyaKung/MiniProjectCS104
+✅ render.yaml ในโปรเจค (ทำเสร็จแล้ว)
+✅ requirements.txt (อัปเดตแล้ว)
+✅ esports_manager.db (ขึ้น GitHub แล้ว)
+
+======================================
+STEP 3: Create New Web Service ใน Render
+======================================
+
+1. ไปที่: https://dashboard.render.com
+2. Click "New +" → "Web Service"
+3. เลือก "Deploy an existing repository"
+
+=====================================
+STEP 4: Select Repository
+=====================================
+
+1. Search: MiniProjectCS104
+2. Click เลือก repository
+
+======================================
+STEP 5: ตั้งค่า Build & Deploy
+======================================
+
+Name: esports-team-manager
+(ชื่อที่ใช้ใน URL)
+
+Runtime: Python 3
+
+Build Command:
+pip install -r requirements.txt
+
+Start Command:
+gunicorn app:app --bind 0.0.0.0:$PORT
+
+Instance Type: Free
+
+======================================
+STEP 6: Environment Variables (Optional)
+======================================
+
+ถ้าต้อง:
+
+Key: FLASK_ENV
+Value: production
+
+Key: FLASK_APP
+Value: app.py
+
+(สำหรับ development ไม่จำเป็น)
+
+======================================
+STEP 7: Deploy!
+======================================
+
+1. Click "Create Web Service"
+2. Render จะเริ่ม build & deploy
+3. รอ 3-5 นาที
+
+✅ ให้ URL: https://[name].onrender.com
+
+======================================
+🎉 DEPLOYMENT COMPLETE!
+======================================
+
+Test ที่:
+https://esports-team-manager.onrender.com
+
+(ถ้าเลือกชื่อ esports-team-manager)
+
+======================================
+📝 Auto Deploy
+======================================
+
+เมื่อนี้ไป:
+
+1. Push code ขึ้น GitHub
+2. Render auto detect ว่ามี changes
+3. Auto rebuild & redeploy
+4. ไม่ต้องทำอะไรเพิ่มเติม!
+
+======================================
+💾 Database
+======================================
+
+Database file (esports_manager.db):
+
+ทำงานปกติ
+ข้อมูลจะเก็บไว้ใน Render storage
+เมื่อ redeploy ข้อมูลยังอยู่
+
+⚠️ ถ้าต้อง production:
+→ ใช้ PostgreSQL (Render ให้ฟรี)
+→ เปลี่ยน app.py ให้ใช้ PostgreSQL
+
+======================================
+🔧 Troubleshooting
+======================================
+
+❌ Deploy Failed
+
+1. ดูที่ "Logs" ใน Render dashboard
+2. มองหา error message
+3. ข้อปัญหาทั่วไป:
+   - requirements.txt ไม่อ่าน → รอนิด
+   - Python version ผิด → เปลี่ยนเป็น 3.11
+   - Start command ผิด → ตรวจสอบ gunicorn
+
+❌ Site ขึ้น Error
+
+1. ดูที่ "Logs"
+2. ถ้าเป็น database:
+   → ตรวจสอบ file permissions
+   → ลบ db แล้วให้ reinitialize
+
+==================================
+💡 Tips
+======================================
+
+1. URL ของคุณ:
+   https://[your-name].onrender.com
+
+2. Free tier:
+   - ไม่มี egress charges
+   - Cold start หลังนอน 15 นาที
+   - ขอบเขต: CPU/RAM ประมาณ
+
+3. Database:
+   - SQLite ทำงาน
+   - Data persist ระหว่าง deploys
+   - Backup: ใช้ GitHub
+
+======================================
+✅ Done!
+======================================
+
+ตอนนี้ app live บน:
+https://esports-team-manager.onrender.com
+
+Share URL ได้เลย! 🎉
+
+======================================
